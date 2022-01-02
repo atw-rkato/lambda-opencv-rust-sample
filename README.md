@@ -1,0 +1,1 @@
+# lambda-opencv-rust-sample
