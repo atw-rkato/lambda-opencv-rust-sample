@@ -96,15 +96,15 @@ mod tests {
     use opencv::imgproc::{
         contour_area, cvt_color, gaussian_blur, polylines, threshold, CHAIN_APPROX_NONE,
         CHAIN_APPROX_SIMPLE, COLOR_BGR2GRAY, COLOR_BGR2HSV, RETR_EXTERNAL, THRESH_BINARY,
-        THRESH_BINARY_INV,
     };
     use opencv::types::VectorOfMat;
 
     #[test]
     #[ignore]
-    fn read_img() -> Result<()> {
+    fn tulip() -> Result<()> {
         let filename = "img/tulip.jpg";
         let file = Path::new(filename);
+        let dir = file.parent().and_then(Path::to_str).context("")?;
         let stem = file.file_stem().and_then(OsStr::to_str).context("")?;
         let ext = file.extension().and_then(OsStr::to_str).context("")?;
 
@@ -140,10 +140,10 @@ mod tests {
         )?;
 
         for c in contours {
-            polylines(&mut img, &c, true, Scalar::new(0., 0., 0., 1.), 10, 8, 0)?;
+            polylines(&mut img, &c, true, Scalar::new(0., 255., 0., 1.), 10, 8, 0)?;
         }
         imwrite(
-            &format!("{filename}-contours.{ext}"),
+            &format!("{dir}/{stem}-contours.{ext}"),
             &img,
             &Default::default(),
         )?;
@@ -152,9 +152,10 @@ mod tests {
 
     #[test]
     #[ignore]
-    fn miki() -> Result<()> {
-        let filename = "img/jfcolor.jpeg";
+    fn jellyfish() -> Result<()> {
+        let filename = "img/jellyfish.jpeg";
         let file = Path::new(filename);
+        let dir = file.parent().and_then(Path::to_str).context("")?;
         let stem = file.file_stem().and_then(OsStr::to_str).context("")?;
         let ext = file.extension().and_then(OsStr::to_str).context("")?;
 
@@ -180,7 +181,7 @@ mod tests {
             polylines(&mut img, &c, true, Scalar::new(0., 255., 0., 1.), 5, 8, 0)?;
         }
         imwrite(
-            &format!("{filename}-contours.{ext}"),
+            &format!("{dir}/{stem}-contours.{ext}"),
             &img,
             &Default::default(),
         )?;
