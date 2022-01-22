@@ -1,38 +1,59 @@
 use std::process;
 
-use anyhow::Result;
-use lambda_runtime::{handler_fn, Context};
-use serde_json::{json, Value};
+use anyhow::{bail, Context, Result};
+use lambda_runtime::handler_fn;
+use serde_json::Value;
 
-fn init_logger() {
-    use std::io::Write;
+use derive_new::new;
+use percent_encoding::percent_decode_str;
 
-    env_logger::builder()
-        .format(|buf, record| {
-            let ts = buf.timestamp_millis();
-            writeln!(
-                buf,
-                "{ts} {level} [{target}] {args} ({file}:{line})",
-                ts = ts,
-                level = record.level(),
-                target = record.target(),
-                args = record.args(),
-                file = record.file().unwrap_or("unknown"),
-                line = record.line().unwrap_or(0),
-            )
-        })
-        .init();
+use crate::app_service::{AppService, AppServiceProps};
+
+mod app_service;
+mod s3_service;
+
+#[derive(new)]
+struct App {
+    service: AppService,
 }
 
-async fn lambda_handler(_: Value, _: Context) -> Result<Value> {
-    lambda_opencv_rust_sample::run()?;
-    Ok(json!({"key": "value"}))
+impl App {
+    async fn lambda_handler(&self, event: Value, _: lambda_runtime::Context) -> Result<()> {
+        let s3 = &event["Records"][0]["s3"];
+        let bucket_name = s3["bucket"]["name"]
+            .as_str()
+            .context("bucket name doesn't exist.")?;
+        let object_key = match s3["object"]["key"].as_str() {
+            Some(key) => percent_decode_str(key).decode_utf8()?,
+            None => bail!("object key doesn't exist."),
+        };
+
+        let props = AppServiceProps {
+            bucket_name: bucket_name.to_string(),
+            object_key: object_key.to_string(),
+        };
+
+        let result = self.service.run(props).await?;
+        Ok(result)
+    }
 }
 
 #[tokio::main]
 async fn main() {
-    init_logger();
-    let func = handler_fn(lambda_handler);
+    tracing_subscriber::fmt()
+        .with_thread_ids(true)
+        .with_thread_names(true)
+        .json()
+        .flatten_event(true)
+        .init();
+
+    let app: App = {
+        let shared_config = aws_config::load_from_env().await;
+        let service = AppService::new(shared_config);
+        App::new(service)
+    };
+
+    let func = handler_fn(|event, context| app.lambda_handler(event, context));
     if let Err(err) = lambda_runtime::run(func).await {
         log::error!("{:?}", err);
         process::exit(1);
