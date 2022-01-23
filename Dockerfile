@@ -1,9 +1,9 @@
 ARG ACCOUNT_ID
-FROM ${ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/lambda-opencv-rust:4.5.5
+FROM ${ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/lambda-opencv-rust:4.5.5-1.58
 
 WORKDIR /code
 COPY src /code/src
-COPY Cargo.toml Cargo.lock /code/
+COPY Cargo.toml Cargo.lock rust-toolchain /code/
 RUN cargo test  --release -j 12 --no-fail-fast -- --nocapture
 RUN cargo build --release -j 12
 RUN cp target/release/bootstrap ${LAMBDA_RUNTIME_DIR}

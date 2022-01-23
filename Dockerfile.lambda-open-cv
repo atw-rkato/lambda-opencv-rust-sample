@@ -1,9 +1,9 @@
 FROM public.ecr.aws/lambda/provided:al2-x86_64
 ARG OPENCV_VERSION=4.5.5
 WORKDIR /work
-RUN yum update && yum install -y make cmake3 clang unzip
+RUN yum update -y && yum install -y make cmake3 clang unzip
 RUN curl -o opencv.zip -L https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip -w "\n"
-RUN unzip opencv.zip && rm -f opencv.zip
+RUN unzip opencv.zip
 
 WORKDIR /work/opencv-build
 RUN ln -s /usr/bin/cmake3 /usr/bin/cmake
@@ -16,9 +16,6 @@ RUN make install
 ENV LD_LIBRARY_PATH="/usr/local/lib64/:${LD_LIBRARY_PATH}"
 RUN ln -s /usr/lib64/libclang.so.11.1 /usr/lib64/libclang.so
 ENV LIBCLANG_PATH="/usr/lib64/libclang.so"
-
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-ENV PATH="/root/.cargo/bin:${PATH}"
 
 WORKDIR ${LAMBDA_TASK_ROOT}
 RUN rm -rf /work/ && \

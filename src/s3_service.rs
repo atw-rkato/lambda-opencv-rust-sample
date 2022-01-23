@@ -31,23 +31,55 @@ impl S3Service {
         Ok(bytes.into_bytes())
     }
 
-    pub async fn put_object(
+    pub async fn upload_image<T>(
         &self,
         bucket_name: impl Into<String>,
         object_key: impl Into<String>,
-        body: Vec<u8>,
-    ) -> Result<()> {
+        body: T,
+        ext: &str,
+    ) -> Result<()>
+    where
+        ByteStream: From<T>,
+    {
         let put_object_output = self
             .client
             .put_object()
             .bucket(bucket_name)
             .key(object_key)
+            .content_type(format!("image/{ext}"))
             .body(ByteStream::from(body))
             .send()
             .await?;
 
         log::info!("{:?}", put_object_output);
 
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{error, fs};
+
+    use crate::drawer;
+    use crate::s3_service::S3Service;
+
+    #[tokio::test]
+    #[ignore]
+    async fn put_object() -> Result<(), Box<dyn error::Error>> {
+        let shared_config = aws_config::load_from_env().await;
+        let s3_service = S3Service::new(&shared_config);
+
+        let img = fs::read("img/jellyfish.jpg")?;
+        let img_contours = drawer::draw_contours(&img, "jpg")?;
+        s3_service
+            .upload_image(
+                "lambda-opencv-rust-input",
+                "jellyfish-contours.jpg",
+                img_contours,
+                "jpg",
+            )
+            .await?;
         Ok(())
     }
 }

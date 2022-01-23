@@ -1,15 +1,16 @@
+use std::fmt::Debug;
 use std::process;
 
 use anyhow::{bail, Context, Result};
-use lambda_runtime::handler_fn;
-use serde_json::Value;
-
 use derive_new::new;
+use lambda_runtime::handler_fn;
 use percent_encoding::percent_decode_str;
+use serde_json::Value;
 
 use crate::app_service::{AppService, AppServiceProps};
 
 mod app_service;
+mod drawer;
 mod s3_service;
 
 #[derive(new)]
