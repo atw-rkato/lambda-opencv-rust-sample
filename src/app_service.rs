@@ -38,7 +38,10 @@ impl AppService {
             .extension()
             .and_then(OsStr::to_str)
             .context("file extension not found.")?;
+
+        log::info!("draw contours start.");
         let img = drawer::draw_contours(uploaded_file.as_ref(), ext)?;
+        log::info!("draw contours end.");
 
         self.s3_service
             .upload_image(format!("{bucket_name}-output"), &object_key, img, ext)

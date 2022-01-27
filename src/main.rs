@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 use std::process;
 
 use anyhow::{bail, Context, Result};

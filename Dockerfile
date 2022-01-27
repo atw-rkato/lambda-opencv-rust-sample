@@ -1,5 +1,5 @@
 ARG ACCOUNT_ID
-FROM ${ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/lambda-opencv-rust:4.5.5-1.58
+FROM ${ACCOUNT_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/lambda-opencv-rust:4.5.5-1.58.1
 
 WORKDIR /code
 COPY src /code/src

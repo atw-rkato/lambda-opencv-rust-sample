@@ -34,7 +34,7 @@ aws-config = "0.4"
 aws-sdk-s3 = "0.4"
 
 # https://crates.io/crates/opencv
-opencv = "0.61"
+opencv = "0.62"
 
 # https://crates.io/crates/bytes
 bytes = "1.1"
