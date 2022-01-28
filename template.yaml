@@ -12,11 +12,15 @@ Resources:
       FunctionName: opencv-rust-sample
       PackageType: Image
       ImageUri: ""
+      MemorySize: 256
+      Timeout: 600
       Environment:
         Variables:
           RUST_LOG: info
           RUST_BACKTRACE: 1
           RUST_LOG_STYLE: never
+      Role:
+        !Sub "arn:aws:iam::${AccountId}:role/lambda-opencv-rust-sample-role"
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: .

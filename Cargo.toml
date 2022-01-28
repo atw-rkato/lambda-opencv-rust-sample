@@ -30,8 +30,8 @@ derive-new = "0.5"
 # https://crates.io/crates/percent-encoding
 percent-encoding = "2.1"
 
-aws-config = "0.4"
-aws-sdk-s3 = "0.4"
+aws-config = "0.6"
+aws-sdk-s3 = "0.6"
 
 # https://crates.io/crates/opencv
 opencv = "0.62"
