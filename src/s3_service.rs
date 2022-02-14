@@ -8,7 +8,7 @@ pub struct S3Service {
 
 impl S3Service {
     pub fn new(shared_config: &aws_config::Config) -> Self {
-        let client = aws_sdk_s3::Client::new(&shared_config);
+        let client = aws_sdk_s3::Client::new(shared_config);
         Self { client }
     }
 
