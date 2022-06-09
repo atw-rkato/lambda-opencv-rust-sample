@@ -2,6 +2,7 @@ use std::ffi::OsStr;
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use aws_types::SdkConfig;
 
 use crate::drawer;
 use crate::s3_service::S3Service;
@@ -16,7 +17,7 @@ pub struct AppService {
 }
 
 impl AppService {
-    pub fn new(shared_config: aws_config::Config) -> Self {
+    pub fn new(shared_config: SdkConfig) -> Self {
         Self {
             s3_service: S3Service::new(&shared_config),
         }

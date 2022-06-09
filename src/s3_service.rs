@@ -1,5 +1,6 @@
 use anyhow::Result;
-use aws_sdk_s3::ByteStream;
+use aws_sdk_s3::types::ByteStream;
+use aws_types::SdkConfig;
 use bytes::Bytes;
 
 pub struct S3Service {
@@ -7,7 +8,7 @@ pub struct S3Service {
 }
 
 impl S3Service {
-    pub fn new(shared_config: &aws_config::Config) -> Self {
+    pub fn new(shared_config: &SdkConfig) -> Self {
         let client = aws_sdk_s3::Client::new(shared_config);
         Self { client }
     }

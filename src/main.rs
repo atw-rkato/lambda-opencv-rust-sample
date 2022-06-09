@@ -2,7 +2,7 @@ use std::process;
 
 use anyhow::{bail, Context, Result};
 use derive_new::new;
-use lambda_runtime::handler_fn;
+use lambda_runtime::{service_fn, LambdaEvent};
 use percent_encoding::percent_decode_str;
 use serde_json::Value;
 
@@ -53,7 +53,7 @@ async fn main() {
         App::new(service)
     };
 
-    let func = handler_fn(|event, context| app.lambda_handler(event, context));
+    let func = service_fn(|req: LambdaEvent<Value>| app.lambda_handler(req.payload, req.context));
     if let Err(err) = lambda_runtime::run(func).await {
         log::error!("{:?}", err);
         process::exit(1);
